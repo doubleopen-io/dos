@@ -11,7 +11,7 @@
         "@typescript-eslint/eslint-plugin": "8.59.1",
         "@typescript-eslint/parser": "8.59.1",
         "eslint": "10.2.1",
-        "eslint-config-turbo": "2.9.7",
-        "eslint-plugin-turbo": "2.9.7"
+        "eslint-config-turbo": "2.9.8",
+        "eslint-plugin-turbo": "2.9.8"
     }
 }
