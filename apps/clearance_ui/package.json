@@ -68,7 +68,7 @@
         "zustand": "5.0.13"
     },
     "devDependencies": {
-        "@next/eslint-plugin-next": "15.5.12",
+        "@next/eslint-plugin-next": "15.5.18",
         "@playwright/test": "1.60.0",
         "@tailwindcss/postcss": "^4.0.0",
         "@testing-library/jest-dom": "6.9.1",
