@@ -23,7 +23,7 @@
         "cors": "2.8.6",
         "database": "*",
         "es-toolkit": "1.46.1",
-        "express": "4.22.1",
+        "express": "4.22.2",
         "express-session": "1.19.0",
         "glob-parent": "^6.0.2",
         "glob-to-regexp": "^0.4.1",
