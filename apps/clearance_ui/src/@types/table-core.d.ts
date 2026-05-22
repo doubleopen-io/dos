@@ -34,5 +34,11 @@ declare module "@tanstack/table-core" {
         type?: string;
         // Option to break the text from any point in the text in the cell.
         breakAll?: boolean;
+        // Options for the select component in the editable select cell.
+        selectOptions?: {
+            value: string;
+            label: string;
+            description?: string;
+        }[];
     }
 }
