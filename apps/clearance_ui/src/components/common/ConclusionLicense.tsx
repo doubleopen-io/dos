@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import * as yaml from "js-yaml";
 import { Check, ChevronsUpDown, XCircle } from "lucide-react";
@@ -62,17 +62,8 @@ const ConclusionLicense = ({
     className,
 }: Props) => {
     const [open, setOpen] = useState(false);
-    const buttonRef = useRef<HTMLButtonElement>(null);
-    const [listWidth, setListWidth] = useState(0);
     const [value, setValue] = useState(concludedLicenseExpressionSPDX);
     const router = useRouter();
-
-    useEffect(() => {
-        if (buttonRef.current) {
-            const width = buttonRef.current.offsetWidth;
-            setListWidth(width * fractionalWidth);
-        }
-    }, [buttonRef.current?.offsetWidth, fractionalWidth]); // Re-run effect if the button's size changes
 
     // Fetch the license classifications from Github
     const { data, isLoading, error } = useQuery({
@@ -95,7 +86,6 @@ const ConclusionLicense = ({
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                     <Button
-                        ref={buttonRef}
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
@@ -114,7 +104,12 @@ const ConclusionLicense = ({
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="p-0" style={{ width: listWidth }}>
+                <PopoverContent
+                    className="p-0"
+                    style={{
+                        width: `calc(var(--radix-popover-trigger-width) * ${fractionalWidth})`,
+                    }}
+                >
                     <Command>
                         <CommandInput placeholder="Search license..." />
                         <CommandEmpty>No license found.</CommandEmpty>
