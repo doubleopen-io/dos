@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,8 @@ type CopyUserDataProps = {
 };
 
 const CopyUserData = ({ copyContent }: CopyUserDataProps) => {
-    const [copied, setCopied] = useState(false);
-
-    useEffect(() => {
-        setCopied(false);
-    }, [copyContent]);
+    const [copiedContent, setCopiedContent] = useState<string | null>(null);
+    const copied = copiedContent === copyContent;
 
     return (
         <div>
@@ -32,7 +29,7 @@ const CopyUserData = ({ copyContent }: CopyUserDataProps) => {
                     <Button
                         size="sm"
                         className={cn("ml-2", copied ? "p-3" : "px-3")}
-                        onClick={() => setCopied(true)}
+                        onClick={() => setCopiedContent(copyContent)}
                         variant={copied ? "success" : "outline"}
                     >
                         <span className="sr-only">Copy</span>
