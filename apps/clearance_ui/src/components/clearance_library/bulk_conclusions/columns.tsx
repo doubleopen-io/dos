@@ -23,11 +23,11 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ActionCell from "@/components/clearance_library/bulk_conclusions/ActionCell";
-import TableCell from "@/components/clearance_library/bulk_conclusions/TableCell";
-import TableCellBoolean from "@/components/clearance_library/bulk_conclusions/TableCellBoolean";
 import BCAffectedFilesTooltip from "@/components/common/BCAffectedFilesTooltip";
 import ClearanceGroupTooltipIcon from "@/components/common/clearance_groups/ClearanceGroupTooltipIcon";
 import PurlDetails from "@/components/common/PurlDetails";
+import EditableBooleanTableCell from "@/components/common/table/EditableBooleanTableCell";
+import EditableTextTableCell from "@/components/common/table/EditableTextTableCell";
 import { parsePurlAndQualifiers } from "@/helpers/parsePurlAndQualifiers";
 
 // Get the table column datatype from the query response
@@ -295,7 +295,7 @@ export const columns = (
                     </Button>
                 );
             },
-            cell: TableCell,
+            cell: EditableTextTableCell,
             meta: {
                 type: "textarea",
                 breakAll: true,
@@ -410,7 +410,7 @@ export const columns = (
                             </Button>
                         );
                     },
-                    cell: TableCell,
+                    cell: EditableTextTableCell,
                     meta: {
                         type: "text",
                     },
@@ -507,7 +507,7 @@ export const columns = (
                     </Button>
                 );
             },
-            cell: TableCell,
+            cell: EditableTextTableCell,
             meta: {
                 type: "textarea",
             },
@@ -517,7 +517,7 @@ export const columns = (
             header: () => (
                 <Label className="cursor-pointer font-bold">Local</Label>
             ),
-            cell: TableCellBoolean,
+            cell: EditableBooleanTableCell,
         },
         {
             accessorKey: "clearanceGroups",

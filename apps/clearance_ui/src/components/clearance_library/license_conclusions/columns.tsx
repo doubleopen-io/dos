@@ -22,10 +22,10 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ActionCell from "@/components/clearance_library/license_conclusions/ActionCell";
-import TableCell from "@/components/clearance_library/license_conclusions/TableCell";
 import ClearanceGroupTooltipIcon from "@/components/common/clearance_groups/ClearanceGroupTooltipIcon";
 import LCAffectedFilesTooltip from "@/components/common/LCAffectedFilesTooltip";
 import PurlDetails from "@/components/common/PurlDetails";
+import EditableTextTableCell from "@/components/common/table/EditableTextTableCell";
 import { parsePurlAndQualifiers } from "@/helpers/parsePurlAndQualifiers";
 
 // Get the table column datatype from the query response
@@ -362,7 +362,7 @@ export const columns = (
                             </Button>
                         );
                     },
-                    cell: TableCell,
+                    cell: EditableTextTableCell,
                     meta: {
                         type: "text",
                     },
@@ -459,7 +459,7 @@ export const columns = (
                     </Button>
                 );
             },
-            cell: TableCell,
+            cell: EditableTextTableCell,
             meta: {
                 type: "textarea",
             },
