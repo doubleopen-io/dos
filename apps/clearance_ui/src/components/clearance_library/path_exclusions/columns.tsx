@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Options } from "nuqs";
-import { userAPI } from "validation-helpers";
+import { userAPI, validReasons } from "validation-helpers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -23,11 +23,11 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ActionCell from "@/components/clearance_library/path_exclusions/ActionCell";
-import TableCell from "@/components/clearance_library/path_exclusions/TableCell";
-import TableCellSelect from "@/components/clearance_library/path_exclusions/TableCellSelect";
 import ClearanceGroupTooltipIcon from "@/components/common/clearance_groups/ClearanceGroupTooltipIcon";
 import PEAffectedFilesTooltip from "@/components/common/PEAffectedFilesTooltip";
 import PurlDetails from "@/components/common/PurlDetails";
+import EditableSelectTableCell from "@/components/common/table/EditableSelectTableCell";
+import EditableTextTableCell from "@/components/common/table/EditableTextTableCell";
 import { parsePurlAndQualifiers } from "@/helpers/parsePurlAndQualifiers";
 
 // Get the table column datatype from the query response
@@ -289,7 +289,7 @@ export const columns = (
                     </Button>
                 );
             },
-            cell: TableCell,
+            cell: EditableTextTableCell,
             meta: {
                 type: "textarea",
                 breakAll: true,
@@ -337,7 +337,14 @@ export const columns = (
                     </Button>
                 );
             },
-            cell: TableCellSelect,
+            cell: EditableSelectTableCell,
+            meta: {
+                selectOptions: validReasons.map((reason) => ({
+                    value: reason.name,
+                    label: reason.name,
+                    description: reason.description,
+                })),
+            },
         },
         {
             accessorKey: "affectedPaths",
@@ -394,7 +401,7 @@ export const columns = (
                     </Button>
                 );
             },
-            cell: TableCell,
+            cell: EditableTextTableCell,
             meta: {
                 type: "textarea",
             },
