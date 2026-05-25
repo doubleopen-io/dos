@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
@@ -62,16 +62,6 @@ const PackageInspector = ({ purl, path }: Props) => {
         new Set(),
     );
     const [pathsWithLFs, setPathsWithLFs] = useState<Set<string>>(new Set());
-    const [uniqueLicensesToColorMap, setUniqueLicensesToColorMap] =
-        useState<Map<string, string> | null>(null);
-    const [
-        fileSha256ToDecomposedLicensesMap,
-        setFileSha256ToDecomposedLicensesMap,
-    ] = useState<Map<string, Set<string>> | null>(null);
-    const [fileSha256ToLFsMap, setFileSha256ToLFsMap] = useState<Map<
-        string,
-        string[]
-    > | null>(null);
     const [glob, setGlob] = useState<string>("");
     const treeDivRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
@@ -189,70 +179,72 @@ const PackageInspector = ({ purl, path }: Props) => {
         window.addEventListener("resize", handleResize);
     }, []);
 
-    // Process license finding data
-    useEffect(() => {
-        if (lfData) {
-            const uniqueLicensesToColor = new Map<string, string>();
-            const fileSha256ToDecomposedLicenses = new Map<
-                string,
-                Set<string>
-            >();
-            const fileSha256ToLFs = new Map<string, string[]>();
+    const {
+        uniqueLicensesToColorMap,
+        fileSha256ToDecomposedLicensesMap,
+        fileSha256ToLFsMap,
+    } = useMemo(() => {
+        if (!lfData) {
+            return {
+                uniqueLicensesToColorMap: null,
+                fileSha256ToDecomposedLicensesMap: null,
+                fileSha256ToLFsMap: null,
+            };
+        }
 
-            const allLicenses = new Set<string>(
-                lfData.licenseFindings.map((lf) => lf.licenseExpressionSPDX),
-            );
+        const uniqueLicensesToColor = new Map<string, string>();
+        const fileSha256ToDecomposedLicenses = new Map<string, Set<string>>();
+        const fileSha256ToLFs = new Map<string, string[]>();
 
-            const decomposedLicenses = decomposeLicenses(allLicenses);
+        const allLicenses = new Set<string>(
+            lfData.licenseFindings.map((lf) => lf.licenseExpressionSPDX),
+        );
 
-            decomposedLicenses.forEach((license) => {
-                uniqueLicensesToColor.set(license, stringToColour(license));
+        const decomposedLicenses = decomposeLicenses(allLicenses);
 
-                for (const lf of lfData.licenseFindings) {
-                    if (
-                        license === lf.licenseExpressionSPDX ||
-                        searchForLicense(license, lf.licenseExpressionSPDX)
-                    ) {
-                        if (
-                            !fileSha256ToDecomposedLicenses.has(lf.fileSha256)
-                        ) {
-                            fileSha256ToDecomposedLicenses.set(
-                                lf.fileSha256,
-                                new Set([license]),
-                            );
-                        } else {
-                            fileSha256ToDecomposedLicenses.set(
-                                lf.fileSha256,
-                                new Set([
-                                    ...fileSha256ToDecomposedLicenses.get(
-                                        lf.fileSha256,
-                                    )!,
-                                    license,
-                                ]),
-                            );
-                        }
+        decomposedLicenses.forEach((license) => {
+            uniqueLicensesToColor.set(license, stringToColour(license));
+
+            for (const lf of lfData.licenseFindings) {
+                if (
+                    license === lf.licenseExpressionSPDX ||
+                    searchForLicense(license, lf.licenseExpressionSPDX)
+                ) {
+                    if (!fileSha256ToDecomposedLicenses.has(lf.fileSha256)) {
+                        fileSha256ToDecomposedLicenses.set(
+                            lf.fileSha256,
+                            new Set([license]),
+                        );
+                    } else {
+                        fileSha256ToDecomposedLicenses.set(
+                            lf.fileSha256,
+                            new Set([
+                                ...fileSha256ToDecomposedLicenses.get(
+                                    lf.fileSha256,
+                                )!,
+                                license,
+                            ]),
+                        );
                     }
                 }
-            });
+            }
+        });
 
-            lfData.licenseFindings.forEach((lf) => {
-                if (!fileSha256ToLFs.has(lf.fileSha256)) {
-                    fileSha256ToLFs.set(lf.fileSha256, [
-                        lf.licenseExpressionSPDX,
-                    ]);
-                } else {
-                    fileSha256ToLFs
-                        .get(lf.fileSha256)
-                        ?.push(lf.licenseExpressionSPDX);
-                }
-            });
+        lfData.licenseFindings.forEach((lf) => {
+            if (!fileSha256ToLFs.has(lf.fileSha256)) {
+                fileSha256ToLFs.set(lf.fileSha256, [lf.licenseExpressionSPDX]);
+            } else {
+                fileSha256ToLFs
+                    .get(lf.fileSha256)
+                    ?.push(lf.licenseExpressionSPDX);
+            }
+        });
 
-            setUniqueLicensesToColorMap(uniqueLicensesToColor);
-            setFileSha256ToDecomposedLicensesMap(
-                fileSha256ToDecomposedLicenses,
-            );
-            setFileSha256ToLFsMap(fileSha256ToLFs);
-        }
+        return {
+            uniqueLicensesToColorMap: uniqueLicensesToColor,
+            fileSha256ToDecomposedLicensesMap: fileSha256ToDecomposedLicenses,
+            fileSha256ToLFsMap: fileSha256ToLFs,
+        };
     }, [lfData]);
 
     // Construct the tree data
