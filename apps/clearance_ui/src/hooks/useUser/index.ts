@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { signIn, useSession } from "next-auth/react";
 import type { Permissions } from "validation-helpers";
@@ -21,9 +21,7 @@ export const useUser = (options?: { required?: boolean }) => {
               }
             : undefined,
     );
-    const [permissions, setPermissions] = useState<Permissions | null>(null);
-
-    const fetchPermissions = async () => {
+    const fetchPermissions = async (): Promise<Permissions> => {
         const response = await fetch("/api/authz/permissions", {
             headers: {
                 Authorization: `Bearer ${session.data?.accessToken}`,
@@ -31,8 +29,7 @@ export const useUser = (options?: { required?: boolean }) => {
         });
 
         if (response.ok) {
-            const data = (await response.json()) as Permissions;
-            return data;
+            return await response.json();
         } else {
             // If error response is 403, it means the user has no permissions
             if (response.status === 403) {
@@ -57,12 +54,6 @@ export const useUser = (options?: { required?: boolean }) => {
         refetchInterval: 5 * 60 * 1000, // Refetch permissions every 5 minutes
         retry: 1,
     });
-
-    useEffect(() => {
-        if (data) {
-            setPermissions(data);
-        }
-    }, [data]);
 
     useEffect(() => {
         if (error) {
@@ -92,7 +83,7 @@ export const useUser = (options?: { required?: boolean }) => {
                   session.data.user.realm_access.roles?.find((role) =>
                       role.startsWith("app-"),
                   ) || "app-no-role",
-              permissions: permissions,
+              permissions: data ?? null,
           }
         : null;
 };
