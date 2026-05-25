@@ -40,6 +40,10 @@ type Props = {
     path: string | undefined;
 };
 
+const selectFileTreeData = (data: {
+    filetrees: Parameters<typeof convertJsonToTree>[0];
+}) => convertJsonToTree(data.filetrees);
+
 const PackageInspector = ({ purl, path }: Props) => {
     const [treeFilter, setTreeFilter] = useState("");
     const [licenseFilter] = useQueryState(
@@ -52,7 +56,6 @@ const PackageInspector = ({ purl, path }: Props) => {
     );
     const [isExpanded, setIsExpanded] = useState(false);
     const [treeHeight, setTreeHeight] = useState(0);
-    const [treeData, setTreeData] = useState<TreeNode[]>([]);
     const [, setSelectedNode] = useState<SelectedNode>();
     const [openedNodeId, setOpenedNodeId] = useState<string>();
     const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -71,13 +74,21 @@ const PackageInspector = ({ purl, path }: Props) => {
     const lfWorkerRef = useRef<Worker>(null);
 
     // Fetch the package file tree data
-    const { data, isLoading, error } = userHooks.useGetFileTree(
+    const {
+        data: treeData,
+        isLoading,
+        error,
+    } = userHooks.useGetFileTree(
         {
             params: {
                 purl: pathPurl,
             },
         },
-        { enabled: !!pathPurl, staleTime: Infinity },
+        {
+            enabled: !!pathPurl,
+            staleTime: Infinity,
+            select: selectFileTreeData,
+        },
     );
 
     // Fetch the package license findings data
@@ -163,7 +174,7 @@ const PackageInspector = ({ purl, path }: Props) => {
 
     // Open the nodes that have the filtered license
     const handleOpenFilteredNodes = () => {
-        if (!lfData) return;
+        if (!lfData || !treeData) return;
         const nodes = findNodesWithLicense(treeData, licenseFilter, lfData);
         treeRef.current?.closeAll();
         // Add a delay to make sure the tree is fully closed before opening the nodes
@@ -247,14 +258,6 @@ const PackageInspector = ({ purl, path }: Props) => {
         };
     }, [lfData]);
 
-    // Construct the tree data
-    useEffect(() => {
-        if (data) {
-            const convertedData = convertJsonToTree(data.filetrees);
-            setTreeData(convertedData);
-        }
-    }, [data]);
-
     // Handle expanding and collapsing the whole tree
     useEffect(() => {
         if (isExpanded && (!licenseFilter || filtering)) {
@@ -265,7 +268,7 @@ const PackageInspector = ({ purl, path }: Props) => {
     }, [isExpanded, filtering, licenseFilter, treeRef]);
 
     useEffect(() => {
-        if (path) {
+        if (path && treeData) {
             const node = findNodeByPath(treeData, path);
             if (node) {
                 setOpenedNodeId(node.id);
@@ -347,7 +350,7 @@ const PackageInspector = ({ purl, path }: Props) => {
     }, []); // Run this effect only once when the component mounts
 
     useEffect(() => {
-        if (pathExclusionsData && treeData.length > 0) {
+        if (pathExclusionsData && treeData && treeData.length > 0) {
             // Post the path exclusions data to the worker
             // The worker will then figure out which nodes to exclude
             peWorkerRef.current?.postMessage({
@@ -360,7 +363,7 @@ const PackageInspector = ({ purl, path }: Props) => {
     }, [pathExclusionsData, treeData]);
 
     useEffect(() => {
-        if (licenseConclusionsData && treeData.length > 0) {
+        if (licenseConclusionsData && treeData && treeData.length > 0) {
             const filesWithLCs = new Set(
                 licenseConclusionsData.licenseConclusions.map(
                     (lc) => lc.fileSha256,
@@ -377,7 +380,7 @@ const PackageInspector = ({ purl, path }: Props) => {
     }, [licenseConclusionsData, treeData]);
 
     useEffect(() => {
-        if (lfData && treeData.length > 0) {
+        if (lfData && treeData && treeData.length > 0) {
             const filesWithLFs = new Set(
                 lfData.licenseFindings.map((lf) => lf.fileSha256),
             );
@@ -468,7 +471,7 @@ const PackageInspector = ({ purl, path }: Props) => {
                         <Loader2 className="mr-2 h-16 w-16 animate-spin" />
                     </div>
                 )}
-                {data && (
+                {treeData && (
                     <Tree
                         className=""
                         data={treeData}
