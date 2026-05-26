@@ -33,7 +33,7 @@ import {
     clearSelectedNodes,
     updateSelectedNodes,
 } from "@/helpers/treeSelectionUtils";
-import type { SelectedNode, TreeNode } from "@/types/index";
+import type { TreeNode } from "@/types/index";
 
 type Props = {
     purl: string;
@@ -56,7 +56,6 @@ const PackageInspector = ({ purl, path }: Props) => {
     );
     const [isExpanded, setIsExpanded] = useState(false);
     const [treeHeight, setTreeHeight] = useState(0);
-    const [, setSelectedNode] = useState<SelectedNode>();
     const [openedNodeId, setOpenedNodeId] = useState<string>();
     const [isSelectionMode, setIsSelectionMode] = useState(false);
     const [selectedNodes, setSelectedNodes] = useState<NodeApi<TreeNode>[]>([]);
@@ -268,13 +267,24 @@ const PackageInspector = ({ purl, path }: Props) => {
     }, [isExpanded, filtering, licenseFilter, treeRef]);
 
     useEffect(() => {
-        if (path && treeData) {
-            const node = findNodeByPath(treeData, path);
-            if (node) {
-                setOpenedNodeId(node.id);
-            }
+        if (!path || !treeData) {
+            return;
         }
-    }, [path, treeData, treeRef]);
+
+        const node = findNodeByPath(treeData, path);
+        if (!node) {
+            return;
+        }
+
+        const animationFrameId = window.requestAnimationFrame(() => {
+            setOpenedNodeId(node.id);
+            treeRef.current?.openParents(node.id);
+        });
+
+        return () => {
+            window.cancelAnimationFrame(animationFrameId);
+        };
+    }, [path, treeData]);
 
     // When in license filtering mode, trick the tree search by license
     // to activate by setting an arbitrary text to the search input.
@@ -486,7 +496,6 @@ const PackageInspector = ({ purl, path }: Props) => {
                         paddingBottom={10}
                         padding={25}
                         onFocus={(node) => {
-                            setSelectedNode(node);
                             if (node.isLeaf) {
                                 setOpenedNodeId(node.id);
                                 if (!isSelectionMode) {
