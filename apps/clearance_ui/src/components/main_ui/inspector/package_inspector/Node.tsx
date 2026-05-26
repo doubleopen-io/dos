@@ -146,10 +146,9 @@ const Node = ({
                             : "ml-1 h-3.5 w-3.5 border-gray-400 bg-white p-0"
                     }
                     checked={selectionStatus === 1}
-                    onClick={() => {
-                        {
-                            setIsSelected(selectionStatus === 1 ? false : true);
-                        }
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        setIsSelected(selectionStatus === 1 ? false : true);
                     }}
                     id={id}
                 />
