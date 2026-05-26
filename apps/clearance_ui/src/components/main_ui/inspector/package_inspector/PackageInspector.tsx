@@ -290,16 +290,15 @@ const PackageInspector = ({ purl, path }: Props) => {
     // to activate by setting an arbitrary text to the search input.
     // Use this text to inform the user that text search is not in use in
     // filtering mode
+    const effectiveTreeFilter = filtering
+        ? "- Not in use in filtering mode -"
+        : treeFilter;
+
     useEffect(() => {
-        if (filtering) {
-            setTreeFilter("- Not in use in filtering mode -");
-        } else {
-            setTreeFilter("");
-            if (licenseFilter && lfData) {
-                handleOpenFilteredNodes();
-            }
+        if (!filtering && licenseFilter && lfData) {
+            handleOpenFilteredNodes();
         }
-    }, [filtering, treeData, licenseFilter]);
+    }, [filtering, treeData, licenseFilter, lfData]);
 
     useEffect(() => {
         /*
@@ -411,7 +410,7 @@ const PackageInspector = ({ purl, path }: Props) => {
                     className="w-full rounded-md text-xs"
                     type="text"
                     placeholder="Filter"
-                    value={treeFilter}
+                    value={effectiveTreeFilter}
                     disabled={filtering}
                     onChange={handleTreeFilter}
                 />
@@ -452,7 +451,11 @@ const PackageInspector = ({ purl, path }: Props) => {
                                 disabled={licenseFilter === ""}
                                 pressed={filtering}
                                 onPressedChange={() => {
-                                    setFiltering(!filtering);
+                                    const nextFiltering = !filtering;
+                                    if (!nextFiltering) {
+                                        setTreeFilter("");
+                                    }
+                                    setFiltering(nextFiltering);
                                 }}
                             >
                                 {filtering ? (
@@ -486,7 +489,7 @@ const PackageInspector = ({ purl, path }: Props) => {
                         className=""
                         data={treeData}
                         openByDefault={false}
-                        searchTerm={treeFilter}
+                        searchTerm={effectiveTreeFilter}
                         searchMatch={(node, term) => handleSearch(node, term)}
                         width="100%"
                         height={treeHeight}
