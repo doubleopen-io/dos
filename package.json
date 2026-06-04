@@ -67,5 +67,5 @@
         "tsx": "4.22.3",
         "turbo": "2.9.15"
     },
-    "packageManager": "npm@11.15.0"
+    "packageManager": "npm@11.16.0"
 }
