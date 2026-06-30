@@ -8,8 +8,8 @@
         "access": "public"
     },
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "8.61.1",
-        "@typescript-eslint/parser": "8.61.1",
+        "@typescript-eslint/eslint-plugin": "8.62.0",
+        "@typescript-eslint/parser": "8.62.0",
         "eslint": "10.5.0",
         "eslint-config-turbo": "2.9.18",
         "eslint-plugin-turbo": "2.9.18"
