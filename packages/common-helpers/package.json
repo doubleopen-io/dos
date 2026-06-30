@@ -9,7 +9,7 @@
         "test": "mocha dist/tests"
     },
     "dependencies": {
-        "pako": "2.1.0"
+        "pako": "2.2.0"
     },
     "devDependencies": {
         "@types/chai": "5.2.3",
