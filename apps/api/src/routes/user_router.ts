@@ -1884,9 +1884,7 @@ const resolveEffectiveClearanceGroupIds = async (
 };
 
 type ClearanceItemType =
-    | "licenseConclusion"
-    | "bulkConclusion"
-    | "pathExclusion";
+    "licenseConclusion" | "bulkConclusion" | "pathExclusion";
 
 const clearanceGroupResolvers = {
     licenseConclusion: dbQueries.getClearanceGroupIdsByLicenseConclusionId,

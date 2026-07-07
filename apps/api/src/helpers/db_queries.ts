@@ -463,12 +463,10 @@ export const createFileIfNotExists = async (
              * the query should be retried (the handleError function would throw the error
              * otherwise).
              */
-            if (
-                !(
-                    error instanceof Prisma.PrismaClientKnownRequestError &&
-                    error.code === "P2002"
-                )
-            ) {
+            if (!(
+                error instanceof Prisma.PrismaClientKnownRequestError &&
+                error.code === "P2002"
+            )) {
                 handleError(error);
             }
 
@@ -503,12 +501,10 @@ export const createFileTreeIfNotExists = async (
              * the queries should be retried (the handleError function would throw the error
              * otherwise).
              */
-            if (
-                !(
-                    error instanceof Prisma.PrismaClientKnownRequestError &&
-                    error.code === "P2002"
-                )
-            ) {
+            if (!(
+                error instanceof Prisma.PrismaClientKnownRequestError &&
+                error.code === "P2002"
+            )) {
                 handleError(error);
             }
 
