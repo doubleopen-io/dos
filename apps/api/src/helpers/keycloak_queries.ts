@@ -20,8 +20,8 @@ type User = ZodiosResponseByAlias<typeof keycloakAPI, "GetUsers">[0];
 export const getAccessToken = async (): Promise<ClientCredentialsToken> => {
     let retries = 3;
     let token:
-        | { token: ClientCredentialsToken; expires_at: number }
-        | undefined = cache.get("adminToken");
+        { token: ClientCredentialsToken; expires_at: number } | undefined =
+        cache.get("adminToken");
 
     const tokenExpired: boolean =
         token !== undefined && new Date(token.expires_at) < new Date();

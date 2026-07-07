@@ -151,9 +151,7 @@ export const parse = (tokens: Token[]): LicenseInfo | ConjunctionInfo => {
         nextParser: () => ConjunctionInfo | LicenseInfo | undefined,
     ) {
         return function parseBinaryOp():
-            | ConjunctionInfo
-            | LicenseInfo
-            | undefined {
+            ConjunctionInfo | LicenseInfo | undefined {
             const left = nextParser();
             if (!left) {
                 return;
