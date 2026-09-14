@@ -20,8 +20,8 @@ export const getS3Client = (
         endpoint: endpoint || "http://localhost:9000",
         region: region || "us-east-1",
         credentials: {
-            accessKeyId: key || "miniouser",
-            secretAccessKey: secret || "miniopassword",
+            accessKeyId: key || "s3user",
+            secretAccessKey: secret || "s3password",
         },
         requestHandler: new NodeHttpHandler({
             httpsAgent: new https.Agent({
