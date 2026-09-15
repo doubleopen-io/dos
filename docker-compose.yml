@@ -34,34 +34,34 @@ services:
             retries: 5
 
     s3:
-        image: minio/minio
+        image: rustfs/rustfs:1.0.0-rc.6
         ports:
             - "9000:9000"
             - "9001:9001"
         volumes:
             - s3-data:/data
         environment:
-            MINIO_ROOT_USER: s3user
-            MINIO_ROOT_PASSWORD: s3password
-        command: server --console-address ":9001" /data
+            RUSTFS_ACCESS_KEY: s3user
+            RUSTFS_SECRET_KEY: s3password
         restart: always
         healthcheck:
-            test: ["CMD", "mc", "ready", "local"]
-            interval: 1s
-            timeout: 1s
+            test:
+                ["CMD", "curl", "--fail", "http://localhost:9000/health/ready"]
+            interval: 2s
+            timeout: 2s
             retries: 20
+            start_period: 5s
 
     createbuckets:
-        image: minio/mc
+        image: rustfs/rc:v0.1.35
         depends_on:
             s3:
                 condition: service_healthy
                 required: true
         entrypoint: >
             /bin/sh -c "
-            /usr/bin/mc alias set myminio http://s3:9000 s3user s3password;
-            /usr/bin/mc mb myminio/doubleopen;
-            exit 0;
+            rc alias set local http://s3:9000 s3user s3password &&
+            rc bucket create -p local/doubleopen
             "
 
     run-migrations:
