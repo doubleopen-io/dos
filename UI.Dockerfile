@@ -7,7 +7,7 @@ FROM node:24.21.0 AS base
 FROM base AS builder
 WORKDIR /app
 
-RUN npm i -g turbo
+RUN npm i -g turbo@2
 
 COPY . .
 

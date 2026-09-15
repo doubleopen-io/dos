@@ -52,7 +52,7 @@ To run this project you will need Node.js, npm and Docker installed.
     docker compose up -d
     ```
 
-    This will setup PostgreSQL, Minio S3 storage and Redis work queue, and a Scanner Worker.
+    This will setup PostgreSQL, SeaweedFS S3 storage and Redis work queue, and a Scanner Worker.
 
 5.  Run migrations to the database and seed it with test data (this command can also be used to reset the database):
 

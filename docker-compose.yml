@@ -33,36 +33,24 @@ services:
             timeout: 5s
             retries: 5
 
-    minio:
-        image: minio/minio
+    seaweedfs:
+        image: chrislusf/seaweedfs:4.47
         ports:
-            - "9000:9000"
-            - "9001:9001"
+            - "8333:8333"
         volumes:
-            - minio-data:/data
+            - seaweedfs-data:/data
         environment:
-            MINIO_ROOT_USER: s3user
-            MINIO_ROOT_PASSWORD: s3password
-        command: server --console-address ":9001" /data
+            AWS_ACCESS_KEY_ID: s3user
+            AWS_SECRET_ACCESS_KEY: s3password
+            S3_BUCKET: doubleopen
+        command: mini -dir=/data
         restart: always
         healthcheck:
-            test: ["CMD", "mc", "ready", "local"]
-            interval: 1s
-            timeout: 1s
+            test: ["CMD", "curl", "--fail", "http://localhost:8333/healthz"]
+            interval: 2s
+            timeout: 2s
             retries: 20
-
-    createbuckets:
-        image: minio/mc
-        depends_on:
-            minio:
-                condition: service_healthy
-                required: true
-        entrypoint: >
-            /bin/sh -c "
-            /usr/bin/mc alias set myminio http://minio:9000 s3user s3password;
-            /usr/bin/mc mb myminio/doubleopen;
-            exit 0;
-            "
+            start_period: 5s
 
     run-migrations:
         build:
@@ -114,7 +102,7 @@ services:
             - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
             - KEYCLOAK_URL=http://auth:8080
             - ALLOWED_ORIGINS=http://clearance-ui:3000
-            - SPACES_ENDPOINT=http://minio:9000
+            - SPACES_ENDPOINT=http://seaweedfs:8333
             - REDIS_URL=redis://redis:6379
             - PORT=3001
         healthcheck:
@@ -132,7 +120,7 @@ services:
             redis:
                 condition: service_healthy
                 required: true
-            minio:
+            seaweedfs:
                 condition: service_healthy
                 required: true
             auth:
@@ -147,11 +135,11 @@ services:
             dockerfile: Worker.Dockerfile
         environment:
             - REDIS_URL=redis://redis:6379
-            - SPACES_ENDPOINT=http://minio:9000
+            - SPACES_ENDPOINT=http://seaweedfs:8333
             - DEBUG=true
         depends_on:
             - redis
-            - minio
+            - seaweedfs
 
     clearance-ui:
         build:
@@ -188,7 +176,7 @@ volumes:
         driver: local
     redis-data:
         driver: local
-    minio-data:
+    seaweedfs-data:
         driver: local
     keycloak-data:
         driver: local

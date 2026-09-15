@@ -17,7 +17,7 @@ export const getS3Client = (
 ): S3Client => {
     return new S3Client({
         forcePathStyle: forcePathStyle,
-        endpoint: endpoint || "http://localhost:9000",
+        endpoint: endpoint || "http://localhost:8333",
         region: region || "us-east-1",
         credentials: {
             accessKeyId: key || "s3user",
@@ -32,5 +32,6 @@ export const getS3Client = (
             requestTimeout: 15000,
             connectionTimeout: 6000,
         }),
+        requestChecksumCalculation: "WHEN_REQUIRED",
     });
 };

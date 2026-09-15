@@ -33,7 +33,7 @@ jobs:
             - name: Build images
               run: docker compose build
             - name: Start the testing environment
-              run: docker compose up api clearance-ui scanner-worker createbuckets -d
+              run: docker compose up api clearance-ui scanner-worker -d
             - name: Seed the database and populate the spaces bucket
               run: npm run db:migrate:reset
             - name: Run Playwright tests
