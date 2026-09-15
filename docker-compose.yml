@@ -33,13 +33,13 @@ services:
             timeout: 5s
             retries: 5
 
-    minio:
+    s3:
         image: minio/minio
         ports:
             - "9000:9000"
             - "9001:9001"
         volumes:
-            - minio-data:/data
+            - s3-data:/data
         environment:
             MINIO_ROOT_USER: s3user
             MINIO_ROOT_PASSWORD: s3password
@@ -54,12 +54,12 @@ services:
     createbuckets:
         image: minio/mc
         depends_on:
-            minio:
+            s3:
                 condition: service_healthy
                 required: true
         entrypoint: >
             /bin/sh -c "
-            /usr/bin/mc alias set myminio http://minio:9000 s3user s3password;
+            /usr/bin/mc alias set myminio http://s3:9000 s3user s3password;
             /usr/bin/mc mb myminio/doubleopen;
             exit 0;
             "
@@ -114,7 +114,7 @@ services:
             - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
             - KEYCLOAK_URL=http://auth:8080
             - ALLOWED_ORIGINS=http://clearance-ui:3000
-            - SPACES_ENDPOINT=http://minio:9000
+            - SPACES_ENDPOINT=http://s3:9000
             - REDIS_URL=redis://redis:6379
             - PORT=3001
         healthcheck:
@@ -132,7 +132,7 @@ services:
             redis:
                 condition: service_healthy
                 required: true
-            minio:
+            s3:
                 condition: service_healthy
                 required: true
             auth:
@@ -147,11 +147,11 @@ services:
             dockerfile: Worker.Dockerfile
         environment:
             - REDIS_URL=redis://redis:6379
-            - SPACES_ENDPOINT=http://minio:9000
+            - SPACES_ENDPOINT=http://s3:9000
             - DEBUG=true
         depends_on:
             - redis
-            - minio
+            - s3
 
     clearance-ui:
         build:
@@ -188,7 +188,7 @@ volumes:
         driver: local
     redis-data:
         driver: local
-    minio-data:
+    s3-data:
         driver: local
     keycloak-data:
         driver: local
