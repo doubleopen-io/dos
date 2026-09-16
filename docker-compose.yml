@@ -53,7 +53,7 @@ services:
             start_period: 5s
 
     createbuckets:
-        image: rustfs/rc:v0.1.35
+        image: rustfs/rc:v0.1.36
         depends_on:
             s3:
                 condition: service_healthy
