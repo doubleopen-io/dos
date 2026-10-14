@@ -18,9 +18,16 @@ import { cn } from "@/lib/utils";
 
 const ClearanceToolbar = () => {
     const router = useRouter();
-    const [purl, path] = useMainUiStore(
+    const [storedPurl, storedPath] = useMainUiStore(
         useShallow((state) => [state.purl, state.path]),
     );
+    const purl = typeof router.query.purl === "string" ? router.query.purl : "";
+    const path =
+        typeof router.query.path === "string"
+            ? router.query.path
+            : storedPurl === purl
+              ? storedPath
+              : "";
 
     // Get the counts of different clearance items for this package, to show in the toolbar
     const { data: licenseConclusionCount } =
