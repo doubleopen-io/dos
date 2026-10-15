@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # Base image
-FROM node:24.21.0
+FROM node:24.22.0
 
 # ScanCode
 
