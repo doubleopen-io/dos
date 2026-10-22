@@ -31,7 +31,7 @@
         "prisma": "6.19.3",
         "ts-node": "10.9.2",
         "tsconfig": "*",
-        "tsup": "8.5.1",
+        "tsup": "9.0.0",
         "typescript": "5.9.3"
     },
     "prisma": {
