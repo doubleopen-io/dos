@@ -30,6 +30,27 @@ excludes:
     reason: "TEST_OF"
     comment: "This directory contains tests for SPDX validation."
 
+resolutions:
+  issues:
+  - message: "invalid: @typescript-eslint/eslint-plugin@.*"
+    reason: "BUILD_TOOL_ISSUE"
+    comment: "npm ls, run by ORT's NPM analyzer after installing the workspace, reports
+      @typescript-eslint/eslint-plugin as invalid. The hoisted plugin is at 8.x, while
+      eslint-plugin-jest 27.x (pulled in by @vercel/style-guide 6.x via
+      eslint-config-custom) declares a peer dependency range of ^5.0.0 || ^6.0.0 ||
+      ^7.0.0 on it. The peer range mismatch is a lint-time concern only: the package is
+      a dev-only linting tool, already excluded at scope level via the devDependencies
+      scope exclude, so this has no effect on production dependency analysis."
+  - message: "@img/sharp-wasm32@.*"
+    reason: "BUILD_TOOL_ISSUE"
+    comment: "npm ls reports @img/sharp-wasm32 and its nested @emnapi/runtime as
+      extraneous. It is a platform-specific WebAssembly build of sharp, depended on
+      only by @img/sharp-freebsd-wasm32 and @img/sharp-webcontainers-wasm32, which npm
+      skips on ORT's linux-x64 analyzer host; the lock file still installs it, leaving
+      it without a dependant. sharp itself is an optional dependency of next, used for
+      image optimization; the extraneous wasm32 binary is not used on this platform
+      and does not affect dependency analysis."
+
 license_choices:
   repository_license_choices:
   - given: CC0-1.0 OR MIT
