@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM node:24.22.3
+FROM node:26.13.1
 
 # Install dependencies for API and Clearance UI
 WORKDIR /workspace
