@@ -23,6 +23,6 @@
         "jest": "^30.0.0",
         "ts-jest": "^29.2.5",
         "tsup": "9.0.0",
-        "typescript": "5.9.3"
+        "typescript": "7.0.2"
     }
 }
