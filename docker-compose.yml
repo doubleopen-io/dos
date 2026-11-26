@@ -4,7 +4,7 @@
 
 services:
     db:
-        image: postgres:18.7
+        image: postgres:19.0
         volumes:
             - db-data:/var/lib/postgresql
         ports:
