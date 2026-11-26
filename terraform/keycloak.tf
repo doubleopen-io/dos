@@ -110,6 +110,20 @@ resource "keycloak_openid_client" "dos_api_openid_client" {
   web_origins                     = ["+"] # + means all origins of Valid Redirect URIs
 }
 
+# Assign default and optional client scopes to the DOS API client.
+resource "keycloak_client_scope_assignments" "dos_api_scopes" {
+  realm_id  = keycloak_realm.dos_dev_realm.id
+  client_id = keycloak_openid_client.dos_api_openid_client.id
+
+  default_scopes = [
+    "basic",
+    "roles",
+    "kc-admin-api"
+  ]
+
+  optional_scopes = []
+}
+
 # Get the realm-management client. This is needed to assign roles to the
 # service account of the API client.
 data "keycloak_openid_client" "realm_management_client" {
