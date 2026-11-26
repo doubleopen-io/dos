@@ -46,20 +46,6 @@ export const getPasswordSchema = (required: boolean) => {
         });
 };
 
-export const sha256Schema = (required: boolean) => {
-    const requiredObject = required
-        ? { required_error: "Sha256 is required" }
-        : undefined;
-    return z
-        .string(requiredObject)
-        .trim()
-        .min(64, "Sha256 has to be 64 characters long")
-        .max(64, "Sha256 has to be 64 characters long")
-        .refine((sha256) => sha256.match(/^[a-f0-9]+$/i), {
-            message: "Sha256 must be hexadecimal",
-        });
-};
-
 export const purlSchema = (required: boolean) => {
     const requiredObject = required
         ? { required_error: "Purl is required" }

@@ -13,7 +13,7 @@ if (!baseUrl) {
     throw new Error("NEXT_PUBLIC_API_URL not set");
 }
 
-export const authZodios = new Zodios(baseUrl + "auth/", authAPI);
+const authZodios = new Zodios(baseUrl + "auth/", authAPI);
 
 authZodios.axios.interceptors.request.use(
     (config) => {
@@ -30,7 +30,7 @@ authZodios.axios.interceptors.request.use(
 );
 export const authHooks = new ZodiosHooks("authApi", authZodios);
 
-export const adminZodios = new Zodios(baseUrl + "admin/", adminAPI);
+const adminZodios = new Zodios(baseUrl + "admin/", adminAPI);
 adminZodios.axios.interceptors.request.use(
     (config) => {
         const token = getAccessToken();
@@ -46,7 +46,7 @@ adminZodios.axios.interceptors.request.use(
 );
 export const adminHooks = new ZodiosHooks("adminApi", adminZodios);
 
-export const userZodios = new Zodios(baseUrl + "user/", userAPI);
+const userZodios = new Zodios(baseUrl + "user/", userAPI);
 userZodios.axios.interceptors.request.use(
     (config) => {
         const token = getAccessToken();

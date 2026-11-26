@@ -129,7 +129,7 @@ export const clearSelectedNodes = (
 };
 
 // Function to create a simplified glob pattern from the selected nodes
-export const createGlob = (selectedNodes: NodeApi<TreeNode>[]) => {
+const createGlob = (selectedNodes: NodeApi<TreeNode>[]) => {
     let remainingNodes = selectedNodes;
     let pattern: string[] = [];
 
@@ -193,7 +193,7 @@ export const createGlob = (selectedNodes: NodeApi<TreeNode>[]) => {
 
 // Helper function that returns the number of selected children of a node
 // Returned value is a string: "all", "some" or "none"
-export const getSelectedChildrenStatus = (node: NodeApi<TreeNode>) => {
+const getSelectedChildrenStatus = (node: NodeApi<TreeNode>) => {
     const selectedChildren = node.children?.filter(
         (child) => child.data.selectionStatus === 1,
     );
