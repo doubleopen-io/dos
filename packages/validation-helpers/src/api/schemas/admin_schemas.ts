@@ -142,7 +142,7 @@ export const PutReassignClearanceItemsRes = z.object({
 
 //---------------- Clearance Group Schemas ----------------
 
-export const CuratorRoleEnum = z.enum(["READER", "WRITER"]);
+const CuratorRoleEnum = z.enum(["READER", "WRITER"]);
 
 export const ClearanceGroup = z.object({
     id: z.number(),

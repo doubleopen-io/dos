@@ -93,7 +93,7 @@ const UserRepresentation = z.object({
 
 export const GetUsersResponse = z.array(UserRepresentation);
 
-export const RealmRole = z.object({
+const RealmRole = z.object({
     id: z.string(),
     name: z.string(),
     clientRole: z.boolean(),

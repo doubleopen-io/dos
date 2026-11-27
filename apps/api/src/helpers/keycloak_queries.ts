@@ -17,7 +17,7 @@ type RealmRole = ZodiosResponseByAlias<typeof keycloakAPI, "GetRealmRoles">[0];
 
 type User = ZodiosResponseByAlias<typeof keycloakAPI, "GetUsers">[0];
 
-export const getAccessToken = async (): Promise<ClientCredentialsToken> => {
+const getAccessToken = async (): Promise<ClientCredentialsToken> => {
     let retries = 3;
     let token:
         { token: ClientCredentialsToken; expires_at: number } | undefined =
@@ -280,7 +280,7 @@ export const deleteUser = async (userId: string): Promise<boolean> => {
     return true;
 };
 
-export const getRealmRoles = async (): Promise<RealmRole[]> => {
+const getRealmRoles = async (): Promise<RealmRole[]> => {
     let retries = 3;
     let roles: RealmRole[] | null = null;
 

@@ -844,39 +844,6 @@ export const updateFile = async (input: {
     return file;
 };
 
-export const updateManyFilesStatuses = async (
-    fileHashes: string[],
-    scanStatus: string,
-): Promise<{ count: number }> => {
-    let retries = initialRetryCount;
-    let batchUpdate = null;
-
-    while (!batchUpdate && retries > 0) {
-        try {
-            batchUpdate = await prisma.file.updateMany({
-                where: {
-                    sha256: {
-                        in: fileHashes,
-                    },
-                },
-                data: {
-                    scanStatus: scanStatus,
-                },
-            });
-        } catch (error) {
-            console.log("Error with trying to update Files: " + error);
-            handleError(error);
-            retries--;
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-
-    if (!batchUpdate) throw new Error("Error: Unable to update Files");
-
-    return batchUpdate;
-};
-
 export const updatePackage = async (input: {
     id: number;
     data: Prisma.PackageUpdateInput;
@@ -904,37 +871,6 @@ export const updatePackage = async (input: {
     if (!packageObj) throw new Error("Error: Unable to update Package");
 
     return packageObj;
-};
-
-export const updatePackagesScanStatusesByPurl = async (
-    purl: string,
-    scanStatus: string,
-): Promise<{ count: number }> => {
-    let retries = initialRetryCount;
-    let batchUpdate = null;
-
-    while (!batchUpdate && retries > 0) {
-        try {
-            batchUpdate = await prisma.package.updateMany({
-                where: {
-                    purl: purl,
-                },
-                data: {
-                    scanStatus: scanStatus,
-                },
-            });
-        } catch (error) {
-            console.log("Error with trying to update Packages: " + error);
-            handleError(error);
-            retries--;
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-
-    if (!batchUpdate) throw new Error("Error: Unable to update Packages");
-
-    return batchUpdate;
 };
 
 export const updatePathExclusion = async (
@@ -1064,37 +1000,6 @@ export const updateManyLicenseConclusions = async (
         throw new Error("Error: Unable to update LicenseConclusions");
 
     return batchUpdate;
-};
-
-export const updateBulkConclusion = async (
-    id: number,
-    input: Prisma.BulkConclusionUpdateInput,
-): Promise<BulkConclusion> => {
-    let retries = initialRetryCount;
-    let bulkConclusion: BulkConclusion | null = null;
-
-    while (!bulkConclusion && retries > 0) {
-        try {
-            bulkConclusion = await prisma.bulkConclusion.update({
-                where: {
-                    id: id,
-                },
-                data: input,
-            });
-        } catch (error) {
-            console.log("Error with trying to update BulkConclusion: " + error);
-
-            handleError(error);
-            retries--;
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-
-    if (!bulkConclusion)
-        throw new Error("Error: Unable to update BulkConclusion");
-
-    return bulkConclusion;
 };
 
 export const updateBulkConclusionPackageId = async (
@@ -1817,77 +1722,6 @@ export const findIfFtByPkgIdAndPathRegexExists = async (
     return exists;
 };
 
-export const findMatchingPath = async (input: {
-    purl: string;
-    path: string;
-}): Promise<boolean> => {
-    let retries = initialRetryCount;
-    let querySuccess = false;
-    let match = null;
-
-    while (!querySuccess && retries > 0) {
-        try {
-            match = await prisma.fileTree.findFirst({
-                where: {
-                    package: {
-                        purl: input.purl,
-                    },
-                    path: input.path,
-                },
-            });
-            querySuccess = true;
-        } catch (error) {
-            console.log(
-                "Error with trying to find matching path in filetree: " + error,
-            );
-            handleError(error);
-            retries--;
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-
-    if (match) return true;
-
-    return false;
-};
-
-export const findFilePathsByPackagePurl = async (
-    purl: string,
-): Promise<string[]> => {
-    let retries = initialRetryCount;
-    let querySuccess = false;
-    let filepaths: string[] = [];
-
-    while (!querySuccess && retries > 0) {
-        try {
-            filepaths = await prisma.fileTree
-                .findMany({
-                    where: {
-                        package: {
-                            purl: purl,
-                        },
-                    },
-                    select: {
-                        path: true,
-                    },
-                })
-                .then((filetrees: { path: string }[]) => {
-                    return filetrees.map((filetree) => filetree.path);
-                });
-            querySuccess = true;
-        } catch (error) {
-            console.log("Error with trying to find FileTrees: " + error);
-            handleError(error);
-            retries--;
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-
-    return filepaths;
-};
-
 export const findScannerJobByPackageId = async (
     packageId: number,
 ): Promise<ScannerJob | null> => {
@@ -2044,37 +1878,6 @@ export const findScannerJobStateById = async (
                     id: true,
                     state: true,
                     failureMessage: true,
-                },
-            });
-            querySuccess = true;
-        } catch (error) {
-            console.log("Error with trying to find ScannerJob: " + error);
-            handleError(error);
-            retries--;
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-
-    return scannerJob;
-};
-
-export const findScannerJobIdStateByPackageId = async (
-    packageId: number,
-): Promise<{ id: string; state: string } | null> => {
-    let retries = initialRetryCount;
-    let scannerJob: { id: string; state: string } | null = null;
-    let querySuccess = false;
-
-    while (!querySuccess && retries > 0) {
-        try {
-            scannerJob = await prisma.scannerJob.findFirst({
-                where: {
-                    packageId: packageId,
-                },
-                select: {
-                    id: true,
-                    state: true,
                 },
             });
             querySuccess = true;
@@ -2434,44 +2237,6 @@ export const getPathExclusionsByPackagePurl = async (
     return packageObj.pathExclusions;
 };
 
-export const getPathExclusionPatternsByPackagePurl = async (
-    purl: string,
-): Promise<string[]> => {
-    let retries = initialRetryCount;
-    let patterns: string[] = [];
-
-    while (retries > 0) {
-        try {
-            patterns = await prisma.pathExclusion
-                .findMany({
-                    where: {
-                        package: {
-                            purl: purl,
-                        },
-                    },
-                    select: {
-                        pattern: true,
-                    },
-                })
-                .then((pathExclusions: { pattern: string }[]) => {
-                    return pathExclusions.map((pathExclusion) => {
-                        return pathExclusion.pattern;
-                    });
-                });
-            break;
-        } catch (error) {
-            console.log("Error with trying to find PathExclusions: " + error);
-            handleError(error);
-            retries--;
-
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-
-    return patterns;
-};
-
 export const getPackageScanResults = async (purl: string) => {
     let retries = initialRetryCount;
     let results = null;
@@ -2533,40 +2298,6 @@ export const getPackageScanResults = async (purl: string) => {
     }
 
     return results;
-};
-
-// Find the id of the most recent scanner job with package id
-export const findMostRecentScannerJobByPackageId = async (
-    packageId: number,
-): Promise<{ id: string } | null> => {
-    let retries = initialRetryCount;
-    let scannerJob = null;
-    let querySuccess = false;
-
-    while (!querySuccess && retries > 0) {
-        try {
-            scannerJob = await prisma.scannerJob.findFirst({
-                where: {
-                    packageId: packageId,
-                },
-                orderBy: {
-                    createdAt: "desc",
-                },
-                select: {
-                    id: true,
-                },
-            });
-            querySuccess = true;
-        } catch (error) {
-            console.log("Error with trying to find ScannerJob: " + error);
-            handleError(error);
-            retries--;
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-
-    return scannerJob;
 };
 
 export const findTimeoutScanIssuesByPackageIdAndTimeout = async (
@@ -2705,125 +2436,6 @@ export const findScannedPackages = async (
         }
     }
     return scannedPackages;
-};
-
-export const findFileSha256 = async (
-    purl: string,
-    path: string,
-): Promise<string> => {
-    let fileSha256: string | null = null;
-    let retries = initialRetryCount;
-    let querySuccess = false;
-
-    while (!querySuccess && retries > 0) {
-        try {
-            fileSha256 = await prisma.fileTree
-                .findFirst({
-                    where: {
-                        package: {
-                            purl: purl,
-                        },
-                        path: path,
-                    },
-                    select: {
-                        fileSha256: true,
-                    },
-                })
-                .then((fileTree: { fileSha256: string } | null) => {
-                    if (!fileTree)
-                        throw new Error("Error: Unable to find file sha256");
-
-                    return fileTree.fileSha256;
-                });
-            querySuccess = true;
-        } catch (error) {
-            console.log("Error with trying to find FileSha256: " + error);
-            handleError(error);
-            retries--;
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-
-    if (!fileSha256) throw new Error("Error: Unable to find FileSha256");
-    return fileSha256;
-};
-
-export type FileWithRelations = {
-    licenseFindings: {
-        id: number;
-        updatedAt: Date;
-        licenseExpressionSPDX: string;
-        licenseFindingMatches: {
-            id: number;
-            updatedAt: Date;
-            licenseExpression: string;
-            startLine: number;
-            endLine: number;
-            score: number;
-        }[];
-    }[];
-    copyrightFindings: {
-        id: number;
-        updatedAt: Date;
-        copyright: string;
-        startLine: number;
-        endLine: number;
-    }[];
-};
-
-export const findFileData = async (
-    sha256: string,
-): Promise<FileWithRelations | null> => {
-    let file: FileWithRelations | null = null;
-    let retries = initialRetryCount;
-    let querySuccess = false;
-
-    while (!querySuccess && retries > 0) {
-        try {
-            file = await prisma.file.findUnique({
-                where: {
-                    sha256: sha256,
-                },
-                select: {
-                    licenseFindings: {
-                        select: {
-                            id: true,
-                            updatedAt: true,
-                            licenseExpressionSPDX: true,
-                            licenseFindingMatches: {
-                                select: {
-                                    id: true,
-                                    updatedAt: true,
-                                    licenseExpression: true,
-                                    startLine: true,
-                                    endLine: true,
-                                    score: true,
-                                },
-                            },
-                        },
-                    },
-                    copyrightFindings: {
-                        select: {
-                            id: true,
-                            updatedAt: true,
-                            copyright: true,
-                            startLine: true,
-                            endLine: true,
-                        },
-                    },
-                },
-            });
-            querySuccess = true;
-        } catch (error) {
-            console.log("Error with trying to find FileData: " + error);
-            handleError(error);
-            retries--;
-            if (retries > 0) await waitToRetry();
-            else throw error;
-        }
-    }
-    return file;
 };
 
 type LicenseFindingWithRelations = {
@@ -4454,16 +4066,6 @@ export const getApiClients = async (
                     },
                 },
             },
-            where: where,
-        });
-    });
-};
-
-export const getApiClientsCount = async (
-    where?: Prisma.ApiClientWhereInput,
-) => {
-    return await retry(async () => {
-        return prisma.apiClient.count({
             where: where,
         });
     });
